@@ -1,7 +1,7 @@
 
 const express = require('express');
-const courses = require('./routes/course.router');
-const home = require('./routes/home.router');
+const courses = require('./api/course.api');
+const home = require('./api/home.api');
 
 const app = express();
 app.use(express.json());
