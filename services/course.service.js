@@ -9,7 +9,7 @@ exports.getCourses = async function () {
 					   .sort('name');
 };
 
-exports.getCoursesPage = async function (pageNumber, pageSize) {
+exports.getCoursesByPage = async function (pageNumber, pageSize) {
 	return await Course.find()
 					   .skip((pageNumber - 1) * pageSize)
 					   .limit(pageSize)
@@ -23,6 +23,6 @@ exports.getCourseById = async function (id) {
 					   .select('name tags price');		   
 };
 
-exports.removeCourse = async function (id) {
-	return await Course.findByIdAndDelete({ _id: id });
+exports.removeCourseById = async function (id) {
+	return await Course.deleteOne({ _id: id });
 };
