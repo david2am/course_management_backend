@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Joi = require('joi');
 
-exports.Course = mongoose.model(
+const Course = mongoose.model(
 	'Course',
 	new mongoose.Schema({
 		name: {
@@ -45,3 +46,23 @@ exports.Course = mongoose.model(
 		}
 	})
 );
+
+function validateCourse (course) {
+	const validString = Joi.string().required().trim().default(true).lowercase();
+	const validPrice = Joi.number().min(0).max(200);
+
+	const schema = {
+		name: validString.min(3).max(255),
+		category: validString.valid('web', 'mobile', 'network'),
+		author: validString.min(3).max(255),
+		tags: Joi.array().items(validString),
+		date: Joi.date(),
+		isPublished: Joi.boolean(),
+		price: course.isPublished ? validPrice.required() : validPrice
+	};
+
+	return Joi.validate(course, schema);
+}
+
+exports.Course = Course;
+exports.validate = validateCourse;
