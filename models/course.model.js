@@ -8,20 +8,22 @@ const Course = mongoose.model(
 			type: String,
 			required: true,
 			minlength: 3,
-			maxlength: 255
+			maxlength: 255,
+			trim: true
 		},
 		category: {
 			type: String,
 			required: true,
+			trim: true,
 			enum: [ 'web', 'mobile', 'network' ],
 			lowercase: true,
-			trim: true
 		},
 		author: {
 			type: String,
 			required: true,
 			minlength: 3,
-			maxlength: 255
+			maxlength: 255,
+			trim: true
 		},
 		tags: {
 			type: Array,
@@ -47,22 +49,24 @@ const Course = mongoose.model(
 	})
 );
 
-function validateCourse (course) {
-	const validString = Joi.string().required().trim().default(true).lowercase();
+function validate (course) {
+	const validString = Joi.string().required().trim();
 	const validPrice = Joi.number().min(0).max(200);
 
 	const schema = {
-		name: validString.min(3).max(255),
-		category: validString.valid('web', 'mobile', 'network'),
-		author: validString.min(3).max(255),
-		tags: Joi.array().items(validString),
-		date: Joi.date(),
+		name:        validString.min(3).max(255),
+		category:    validString.default(true).lowercase().valid('web', 'mobile', 'network'),
+		author:      validString.min(3).max(255),
+		tags:        Joi.array().items(validString.default(true).lowercase()),
+		date:        Joi.date(),
 		isPublished: Joi.boolean(),
-		price: course.isPublished ? validPrice.required() : validPrice
+		price:       course.isPublished ? 
+					 validPrice.required() :
+					 validPrice
 	};
 
 	return Joi.validate(course, schema);
 }
 
 exports.Course = Course;
-exports.validate = validateCourse;
+exports.validate = validate;
