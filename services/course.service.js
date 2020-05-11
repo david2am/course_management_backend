@@ -1,15 +1,15 @@
 const { Course } = require('../models/course.model');
 
-exports.saveCourse = async function (doc) {
+async function saveCourse (doc) {
 	return await (new Course(doc)).save();
 };
 
-exports.getCourses = async function () {
+async function getCourses () {
 	return await Course.find()
 					   .sort('name');
 };
 
-exports.getCoursesByPage = async function (pageNumber, pageSize) {
+async function getCoursesByPage (pageNumber, pageSize) {
 	return await Course.find()
 					   .skip((pageNumber - 1) * pageSize)
 					   .limit(pageSize)
@@ -17,12 +17,18 @@ exports.getCoursesByPage = async function (pageNumber, pageSize) {
 					   .select('name tags price');
 };
 
-exports.getCourseById = async function (id) {
+async function getCourseById (id) {
 	return await Course.find({ _id: id })
 					   .sort('name')
 					   .select('name tags price');		   
 };
 
-exports.removeCourseById = async function (id) {
+async function removeCourseById (id) {
 	return await Course.deleteOne({ _id: id });
 };
+
+exports.saveCourse       = saveCourse
+exports.getCourses       = getCourses
+exports.getCoursesByPage = getCoursesByPage
+exports.getCourseById    = getCourseById
+exports.removeCourseById = removeCourseById
