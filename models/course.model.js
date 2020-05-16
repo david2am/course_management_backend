@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
+const { Author } = require('./author.model')
+
 const Course = mongoose.model(
 	'Course',
 	new mongoose.Schema({
@@ -19,11 +21,14 @@ const Course = mongoose.model(
 			lowercase: true,
 		},
 		author: {
-			type: String,
+			type: [Author],
 			required: true,
-			minlength: 3,
-			maxlength: 255,
-			trim: true
+			validate: {
+				validator: function (v) {
+					return v && v.length > 0;
+				},
+				message: 'A course should have at least one author'
+			}
 		},
 		tags: {
 			type: Array,
