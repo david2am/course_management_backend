@@ -1,5 +1,8 @@
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 const express = require('express');
 const courses = require('./api/course.api');
+const authors = require('./api/author.api');
 const home = require('./api/home.api');
 const mongoose = require('mongoose');
 const config = require('config');
@@ -15,6 +18,7 @@ app.use(express.json());
 
 app.use('/', home);
 app.use('/api/courses', courses);
+app.use('/api/authors', authors);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
