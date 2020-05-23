@@ -24,7 +24,7 @@ async function getAuthorById (id) {
 					   .select('-__v');		   
 };
 
-async function updateAuthor (doc, id) {
+async function updateAuthor (doc) {
 	/* const author = await Author.findById(id)
 	if (!author) return
 
@@ -34,7 +34,7 @@ async function updateAuthor (doc, id) {
 
 	return await author.save() */
 
-	return await Author.updateOne({ _id: id }, { 
+	return await Author.updateOne({ _id: doc.id }, { 
 		$set: { 
 			name    : doc.name,
 			bio     : doc.bio,

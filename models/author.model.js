@@ -32,7 +32,7 @@ const Author = mongoose.model('Author', authorSchema);
 function validate(author) {
 	const validString = Joi.string().required().trim().min(3).max(255);
 	const schema = {
-		id      : Joi.objectId(),
+		_id     : Joi.objectId(),
 		name    : validString,
 		bio     : validString.default(true).lowercase(),
 		website : validString
