@@ -6,8 +6,9 @@ const { saveUser,
 		getUsersByPage, 
 		updateUser,
         removeUserById } = require('../services/user.service')
-const { validateUser } = require('../models/user.model');
+const { validateUser } = require('../models/user.model')
 
+const bcrypt = require('bcrypt')
 const _ = require('lodash')
 
 router.get('/', async (req, res) => {
@@ -27,6 +28,9 @@ router.post('/', async (req, res) => {
 	let user = await getUserByEmail (value.email)
 	if (user) return res.status(400).send('User already registered.')
 
+	const salt = await bcrypt.genSalt(10)
+	value.password = await bcrypt.hash(value.password, salt)
+	
 	user = await saveUser (value)
 	user = _.pick(user, ['_id', 'name', 'email'])
 	res.send(user)
