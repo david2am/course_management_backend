@@ -18,10 +18,9 @@ async function getUsersByPage (pageNumber, pageSize) {
 					 .select('-__v');
 };
 
-async function getUserById (id) {
-	return await User.find({ _id: id })
-					 .sort('name')
-					 .select('-__v');		   
+async function getUserByEmail (email) {
+	return await User.findOne({ email: email })
+					 .select('-__v -_id');		   
 };
 
 async function updateUser (doc) {
@@ -41,6 +40,6 @@ async function removeUserById (id) {
 exports.saveUser       = saveUser;
 exports.getUsers       = getUsers;
 exports.getUsersByPage = getUsersByPage;
-exports.getUserById    = getUserById;
+exports.getUserByEmail = getUserByEmail;
 exports.updateUser     = updateUser;
 exports.removeUserById = removeUserById;

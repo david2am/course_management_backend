@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { saveUser,
         getUsers,
-        getUserById,
-		getUsersByPage,
+        getUserByEmail,
+		getUsersByPage, 
 		updateUser,
         removeUserById } = require('../services/user.service')
 const { validateUser } = require('../models/user.model');
+
+const _ = require('lodash')
 
 router.get('/', async (req, res) => {
 	pageNumber = parseInt(req.query.pageNumber)
@@ -22,7 +24,11 @@ router.post('/', async (req, res) => {
 	const { error, value } = validateUser(req.body)
 	if (error) return res.status(400).send(error.message)
 
-	const user = await saveUser (value)
+	let user = await getUserByEmail (value.email)
+	if (user) return res.status(400).send('User already registered.')
+
+	user = await saveUser (value)
+	user = _.pick(user, ['_id', 'name', 'email'])
 	res.send(user)
 });
 
