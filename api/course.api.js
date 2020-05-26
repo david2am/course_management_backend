@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth.middleware')
 const { saveCourse,
 		getCourses,
 		getCoursesByPage,
@@ -7,7 +8,9 @@ const { saveCourse,
 		updateCourse,
 		removeCourseById,
 		updateAuthor } = require('../services/course.service');
-const { getAuthorById, saveAuthor, addAuthor } = require('../services/author.service');
+const { getAuthorById,
+		saveAuthor,
+		addAuthor } = require('../services/author.service');
 const { validateCourse } = require('../models/course.model');
 const { validateAuthor } = require('../models/author.model');
 
@@ -20,7 +23,7 @@ router.get('/', async (req, res) => {
 	res.send(courses);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
 	const { error, value } = validateCourse(req.body);
 	if (error) return res.status(400).send(error.message);
 
@@ -52,7 +55,7 @@ router.get('/:id', async (req, res) => {
 	res.send(course);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
 	const { error, value } = validateCourse(req.body);
 	if (error) return res.status(400).send(error.message);
 
@@ -70,13 +73,13 @@ router.put('/:id', async (req, res) => {
 	res.send(course);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
 	const course = await removeCourseById(req.params.id);
 	if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 	res.send(course);
 });
 
-router.post('/:id/:authorId', async (req, res) => {
+router.post('/:id/:authorId', auth, async (req, res) => {
 	const { error, value } = validateAuthor(req.body);
 	if (error) return res.status(400).send(error.message);
 
@@ -92,7 +95,7 @@ router.post('/:id/:authorId', async (req, res) => {
 	res.send(course_);
 });
 
-router.put('/:id/:authorId', async (req, res) => {
+router.put('/:id/:authorId', auth, async (req, res) => {
 	const { error, value } = validateAuthor(req.body);
 	if (error) return res.status(400).send(error.message);
 

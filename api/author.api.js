@@ -7,6 +7,7 @@ const { saveAuthor,
 		updateAuthor,
         removeAuthorById } = require('../services/author.service')
 const { validateAuthor } = require('../models/author.model');
+const auth = require('../middleware/auth.middleware')
 
 router.get('/', async (req, res) => {
 	pageNumber = parseInt(req.query.pageNumber)
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 	res.send(authors);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
 	const { error, value } = validateAuthor(req.body)
 	if (error) return res.status(400).send(error.message)
 
@@ -32,7 +33,7 @@ router.get('/:id', async (req, res) => {
 	res.send(author)
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
 	const { error, value } = validateAuthor(req.body)
 	if (error) return res.status(400).send(error.message)
 
@@ -42,7 +43,7 @@ router.put('/:id', async (req, res) => {
 	res.send(author)
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
 	const author = await removeAuthorById(req.params.id)
 	if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 	res.send(author)

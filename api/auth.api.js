@@ -1,15 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Joi = require('joi');
-const { saveUser,
-        getUsers,
-        getUserByEmail,
-		getUsersByPage, 
-		updateUser,
-        removeUserById } = require('../services/user.service')
-const { validateUser } = require('../models/user.model')
+const { getUserByEmail } = require('../services/user.service')
 
 const bcrypt = require('bcrypt')
+const Joi = require('joi');
 const _ = require('lodash')
 
 router.post('/', async (req, res) => {
