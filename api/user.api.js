@@ -32,8 +32,9 @@ router.post('/', async (req, res) => {
 	value.password = await bcrypt.hash(value.password, salt)
 	
 	user = await saveUser (value)
-	user = _.pick(user, ['_id', 'name', 'email'])
-	res.send(user)
+
+	const token = user.generateAuthToken()
+	res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
 });
 
 router.get('/:id', async (req, res) => {		

@@ -20,7 +20,7 @@ async function getUsersByPage (pageNumber, pageSize) {
 
 async function getUserByEmail (email) {
 	return await User.findOne({ email: email })
-					 .select('-__v -_id');		   
+					 .select('-__v');		   
 };
 
 async function updateUser (doc) {

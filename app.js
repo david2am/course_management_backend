@@ -1,4 +1,5 @@
 const Joi      = require('joi');
+const auth     = require('./api/auth.api')
 const express  = require('express');
 const mongoose = require('mongoose');
 const config   = require('config');
@@ -8,6 +9,11 @@ const users    = require('./api/user.api');
 const home     = require('./api/home.api');
 
 Joi.objectId   = require('joi-objectid')(Joi);
+
+if (!process.env.course_jwtPrivateKey) {
+	console.error('FATAL ERROR: jwtPrivateKey is not defined')
+	process.exit(1)
+}
 
 const DATABASE_URL = config.get('db.url');
 
@@ -26,6 +32,7 @@ app.use('/', home);
 app.use('/api/courses', courses);
 app.use('/api/authors', authors);
 app.use('/api/users',   users);
+app.use('/api/auth',    auth);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
