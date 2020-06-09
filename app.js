@@ -1,13 +1,14 @@
 const express = require('express');
-const logger = require('./api/logger.api');
-const courses = require('./api/course.api');
-const authors = require('./api/author.api');
-const register = require('./api/registration.api');
+
 const home = require('./api/home.api');
+const authors = require('./api/author.api');
+const courses = require('./api/course.api');
+const users = require('./api/users.api');
+
 const dbConnect = require('./dbConnect');
 
 if (!process.env.course_jwtPrivateKey) {
-    console.error('FATAL ERROR: jwtPrivateKey is not defined');
+    console.error('FATAL ERROR: jwt private key is not defined');
     process.exit(1);
 }
 
@@ -17,10 +18,9 @@ const app = express();
 
 app.use(express.json());
 app.use('/', home);
-app.use('/api/courses', courses);
 app.use('/api/authors', authors);
-app.use('/api/users', register);
-app.use('/api/log', logger);
+app.use('/api/courses', courses);
+app.use('/api/users', users);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));

@@ -1,15 +1,19 @@
-const express = require('express');
-const router = express.Router();
 const {
     getUserByEmail,
     getUserById,
     saveUser
 } = require('../services/user.service')
+
 const { validateUser } = require('../models/user.model')
+
 const auth = require('../middleware/auth.middleware')
 
+const express = require('express');
 const bcrypt = require('bcrypt')
+const Joi = require('joi');
 const _ = require('lodash')
+
+const router = express.Router();
 
 router.get('/me', auth, async(req, res) => {
     try {
@@ -22,7 +26,7 @@ router.get('/me', auth, async(req, res) => {
     }
 });
 
-router.post('/', async(req, res) => {
+router.post('/registration', async(req, res) => {
     try {
         const { error, value } = validateUser(req.body)
         if (error) return res.status(400).send(error.message)
@@ -42,5 +46,33 @@ router.post('/', async(req, res) => {
         res.status(500).send('Something failed.')
     }
 });
+
+router.post('/login', async(req, res) => {
+    try {
+        const { error, value } = validate(req.body)
+        if (error) return res.status(400).send(error.message)
+
+        let user = await getUserByEmail(value.email)
+        if (!user) return res.status(400).send('Invalid email or password.')
+
+        const validPassword = await bcrypt.compare(req.body.password, user.password)
+        if (!validPassword) return res.status(400).send('Invalid email or password.')
+
+        const token = user.generateAuthToken()
+        res.send(token)
+    } catch (ex) {
+        console.log(ex.stack)
+        res.status(500).send('Something failed.')
+    }
+});
+
+function validate(req) {
+    const validString = Joi.string().required().trim().max(255);
+    const schema = {
+        email: validString.min(5).default(true).lowercase().email(),
+        password: validString.min(5)
+    };
+    return Joi.validate(req, schema);
+}
 
 module.exports = router;
