@@ -1,40 +1,26 @@
-const Joi = require('joi');
-const log = require('./api/logger.api');
 const express = require('express');
-const mongoose = require('mongoose');
-const config = require('config');
+const logger = require('./api/logger.api');
 const courses = require('./api/course.api');
 const authors = require('./api/author.api');
 const register = require('./api/registration.api');
 const home = require('./api/home.api');
-
-Joi.objectId = require('joi-objectid')(Joi);
+const dbConnect = require('./dbConnect');
 
 if (!process.env.course_jwtPrivateKey) {
     console.error('FATAL ERROR: jwtPrivateKey is not defined');
     process.exit(1);
 }
 
-const DATABASE_URL = config.get('db.url');
-
-const mongooseSetting = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true
-};
-mongoose
-    .connect(DATABASE_URL, mongooseSetting)
-    .then(() => console.log('Connected to MongoDB...'))
-    .catch(err => console.error('Could not connect to MongoDB...', err));
+dbConnect()
 
 const app = express();
-app.use(express.json());
 
+app.use(express.json());
 app.use('/', home);
 app.use('/api/courses', courses);
 app.use('/api/authors', authors);
 app.use('/api/users', register);
-app.use('/api/log', log);
+app.use('/api/log', logger);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
