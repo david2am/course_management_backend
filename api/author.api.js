@@ -8,6 +8,7 @@ const { saveAuthor,
         removeAuthorById } = require('../services/author.service')
 const { validateAuthor } = require('../models/author.model');
 const auth = require('../middleware/auth.middleware')
+const admin = require('../middleware/admin.middleware')
 
 router.get('/', async (req, res) => {
 	pageNumber = parseInt(req.query.pageNumber)
@@ -43,7 +44,7 @@ router.put('/:id', auth, async (req, res) => {
 	res.send(author)
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [ auth, admin], async (req, res) => {
 	const author = await removeAuthorById(req.params.id)
 	if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 	res.send(author)

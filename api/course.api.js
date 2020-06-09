@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth.middleware')
 const { saveCourse,
 		getCourses,
 		getCoursesByPage,
@@ -13,6 +12,8 @@ const { getAuthorById,
 		addAuthor } = require('../services/author.service');
 const { validateCourse } = require('../models/course.model');
 const { validateAuthor } = require('../models/author.model');
+const auth = require('../middleware/auth.middleware')
+const admin = require('../middleware/admin.middleware')
 
 router.get('/', async (req, res) => {
 	pageNumber = parseInt(req.query.pageNumber);
@@ -73,7 +74,7 @@ router.put('/:id', auth, async (req, res) => {
 	res.send(course);
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
 	const course = await removeCourseById(req.params.id);
 	if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 	res.send(course);

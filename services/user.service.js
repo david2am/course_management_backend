@@ -7,7 +7,7 @@ async function saveUser (doc) {
 async function getUsers () {
 	return await User.find()
 					 .sort('name')
-					 .select('-__v');
+					 .select('-__v -password');
 };
 
 async function getUsersByPage (pageNumber, pageSize) {
@@ -15,12 +15,18 @@ async function getUsersByPage (pageNumber, pageSize) {
 					 .skip((pageNumber - 1) * pageSize)
 					 .limit(pageSize)
 					 .sort('name')
-					 .select('-__v');
+					 .select('-__v -password');
 };
 
 async function getUserByEmail (email) {
 	return await User.findOne({ email: email })
 					 .select('-__v');		   
+};
+
+async function getUserById (id) {
+	return await User.find({ _id: id })
+					   .sort('name')
+					   .select('-__v -password');		   
 };
 
 async function updateUser (doc) {
@@ -41,5 +47,6 @@ exports.saveUser       = saveUser;
 exports.getUsers       = getUsers;
 exports.getUsersByPage = getUsersByPage;
 exports.getUserByEmail = getUserByEmail;
+exports.getUserById    = getUserById;
 exports.updateUser     = updateUser;
 exports.removeUserById = removeUserById;
