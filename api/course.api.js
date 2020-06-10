@@ -19,134 +19,103 @@ const { validateAuthor } = require('../models/author.model');
 const auth = require('../middleware/auth.middleware')
 const admin = require('../middleware/admin.middleware')
 
-router.get('/', async(req, res) => {
-    try {
-        pageNumber = parseInt(req.query.pageNumber);
-        pageSize = parseInt(req.query.pageSize);
-        const courses = pageNumber && pageSize ?
-            await getCoursesByPage(pageNumber, pageSize) :
-            await getCourses();
-        res.send(courses);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
+const asyncMiddleware = require('../middleware/async.middleware')
 
-});
+router.get('/', asyncMiddleware(async(req, res) => {
+    pageNumber = parseInt(req.query.pageNumber);
+    pageSize = parseInt(req.query.pageSize);
 
-router.post('/', auth, async(req, res) => {
-    try {
-        const { error, value } = validateCourse(req.body);
-        if (error) return res.status(400).send(error.message);
+    const courses = pageNumber && pageSize ?
+        await getCoursesByPage(pageNumber, pageSize) :
+        await getCourses();
 
-        let validAuthor = true;
-        let authors = [];
-        for (const a of value.authors) {
-            const author = await getAuthorById(a.id);
-            if (author.length === 0) {
-                validAuthor = false;
-                break;
-            }
-            authors.push(author[0]);
+    res.send(courses);
+}));
+
+router.post('/', auth, asyncMiddleware(async(req, res) => {
+    const { error, value } = validateCourse(req.body);
+    if (error) return res.status(400).send(error.message);
+
+    let validAuthor = true;
+    let authors = [];
+    for (const a of value.authors) {
+        const author = await getAuthorById(a.id);
+        if (author.length === 0) {
+            validAuthor = false;
+            break;
         }
-        if (!validAuthor) return res.status(400).send('Invalid author');
-        value.authors = authors
-
-        const course = await saveCourse(value);
-        res.send(course);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.');
+        authors.push(author[0]);
     }
-});
+    if (!validAuthor) return res.status(400).send('Invalid author');
+    value.authors = authors
 
-router.get('/:id', async(req, res) => {
-    try {
-        const course = await getCourseById(req.params.id);
-        if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
-        res.send(course);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.');
-    }
+    const course = await saveCourse(value);
 
-});
+    res.send(course);
+}));
 
-router.put('/:id', auth, async(req, res) => {
-    try {
-        const { error, value } = validateCourse(req.body);
+router.get('/:id', asyncMiddleware(async(req, res) => {
+    const course = await getCourseById(req.params.id);
+    if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
+    res.send(course);
+}));
+
+router.put('/:id', auth, asyncMiddleware(async(req, res) => {
+    const { error, value } = validateCourse(req.body);
+    if (error) return res.status(400).send(error.message);
+
+    let authors = []
+    for (let author of value.authors) {
+        const { error, value } = validateAuthor(author);
         if (error) return res.status(400).send(error.message);
-
-        let authors = []
-        for (let author of value.authors) {
-            const { error, value } = validateAuthor(author);
-            if (error) return res.status(400).send(error.message);
-            authors.push(value)
-        }
-        value.authors = authors
-
-        const course = await updateCourse(value, req.params.id);
-        if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
-
-        res.send(course);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
+        authors.push(value)
     }
-});
+    value.authors = authors
 
-router.delete('/:id', [auth, admin], async(req, res) => {
-    try {
-        const course = await removeCourseById(req.params.id);
-        if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
-        res.send(course);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+    const course = await updateCourse(value, req.params.id);
+    if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
-router.post('/:id/:authorId', auth, async(req, res) => {
-    try {
-        const { error, value } = validateAuthor(req.body);
-        if (error) return res.status(400).send(error.message);
+    res.send(course);
+}));
 
-        const course = await getCourseById(req.params.id);
-        if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
+router.delete('/:id', [auth, admin], asyncMiddleware(async(req, res) => {
+    const course = await removeCourseById(req.params.id);
+    if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
-        const author = await getAuthorById(req.params.authorId);
-        if (!author) await saveAuthor(value);
+    res.send(course);
+}));
 
-        const author_ = {...value, id: req.params.authorId };
-        const course_ = await addAuthor(req.params.id, author_);
+router.post('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
+    const { error, value } = validateAuthor(req.body);
+    if (error) return res.status(400).send(error.message);
 
-        res.send(course_);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+    const course = await getCourseById(req.params.id);
+    if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
-router.put('/:id/:authorId', auth, async(req, res) => {
-    try {
-        const { error, value } = validateAuthor(req.body);
-        if (error) return res.status(400).send(error.message);
+    const author = await getAuthorById(req.params.authorId);
+    if (!author) await saveAuthor(value);
 
-        const course = await getCourseById(req.params.id);
-        if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
+    const author_ = {...value, id: req.params.authorId };
+    const course_ = await addAuthor(req.params.id, author_);
 
-        const author = await getAuthorById(req.params.authorId);
-        if (!author) return res.status(404).send(`The author with the given id doesn't exist`);
+    res.send(course_);
+}));
 
-        const author_ = {...value, id: author._id };
-        const courseUpdated = await updateAuthor(req.params.id, author_);
-        await saveAuthor(author_);
+router.put('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
+    const { error, value } = validateAuthor(req.body);
+    if (error) return res.status(400).send(error.message);
 
-        res.send(courseUpdated);
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+    const course = await getCourseById(req.params.id);
+    if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
+
+    const author = await getAuthorById(req.params.authorId);
+    if (!author) return res.status(404).send(`The author with the given id doesn't exist`);
+
+    const author_ = {...value, id: author._id };
+    const courseUpdated = await updateAuthor(req.params.id, author_);
+    await saveAuthor(author_);
+
+    res.send(courseUpdated);
+}));
 
 module.exports = router;

@@ -7,6 +7,7 @@ const {
 const { validateUser } = require('../models/user.model')
 
 const auth = require('../middleware/auth.middleware')
+const asyncMiddleware = require('../middleware/async.middleware')
 
 const express = require('express');
 const bcrypt = require('bcrypt')
@@ -15,56 +16,42 @@ const _ = require('lodash')
 
 const router = express.Router();
 
-router.get('/me', auth, async(req, res) => {
-    try {
-        const user = await getUserById(req.user._id)
-        if (!user) return res.status(404).send(`The user with the given id doesn't exist`)
-        res.send(user)
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+router.get('/me', auth, asyncMiddleware(async(req, res) => {
+    const user = await getUserById(req.user._id)
+    if (!user) return res.status(404).send(`The user with the given id doesn't exist`)
 
-router.post('/registration', async(req, res) => {
-    try {
-        const { error, value } = validateUser(req.body)
-        if (error) return res.status(400).send(error.message)
+    res.send(user)
+}));
 
-        let user = await getUserByEmail(value.email)
-        if (user) return res.status(400).send('User already registered.')
+router.post('/registration', asyncMiddleware(async(req, res) => {
+    const { error, value } = validateUser(req.body)
+    if (error) return res.status(400).send(error.message)
 
-        const salt = await bcrypt.genSalt(10)
-        value.password = await bcrypt.hash(value.password, salt)
+    let user = await getUserByEmail(value.email)
+    if (user) return res.status(400).send('User already registered.')
 
-        user = await saveUser(value)
+    const salt = await bcrypt.genSalt(10)
+    value.password = await bcrypt.hash(value.password, salt)
 
-        const token = user.generateAuthToken()
-        res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+    user = await saveUser(value)
 
-router.post('/login', async(req, res) => {
-    try {
-        const { error, value } = validate(req.body)
-        if (error) return res.status(400).send(error.message)
+    const token = user.generateAuthToken()
+    res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
+}));
 
-        let user = await getUserByEmail(value.email)
-        if (!user) return res.status(400).send('Invalid email or password.')
+router.post('/login', asyncMiddleware(async(req, res) => {
+    const { error, value } = validate(req.body)
+    if (error) return res.status(400).send(error.message)
 
-        const validPassword = await bcrypt.compare(req.body.password, user.password)
-        if (!validPassword) return res.status(400).send('Invalid email or password.')
+    let user = await getUserByEmail(value.email)
+    if (!user) return res.status(400).send('Invalid email or password.')
 
-        const token = user.generateAuthToken()
-        res.send(token)
-    } catch (ex) {
-        console.log(ex.stack)
-        res.status(500).send('Something failed.')
-    }
-});
+    const validPassword = await bcrypt.compare(req.body.password, user.password)
+    if (!validPassword) return res.status(400).send('Invalid email or password.')
+
+    const token = user.generateAuthToken()
+    res.send(token)
+}));
 
 function validate(req) {
     const validString = Joi.string().required().trim().max(255);

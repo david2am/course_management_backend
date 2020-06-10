@@ -1,5 +1,6 @@
 const express = require('express');
 
+const error = require('./middleware/error.middleware')
 const home = require('./api/home.api');
 const authors = require('./api/author.api');
 const courses = require('./api/course.api');
@@ -21,6 +22,8 @@ app.use('/', home);
 app.use('/api/authors', authors);
 app.use('/api/courses', courses);
 app.use('/api/users', users);
+
+app.use(error)
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
