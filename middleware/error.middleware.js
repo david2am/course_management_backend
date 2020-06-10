@@ -1,5 +1,7 @@
+const winston = require('winston')
+
 function errorHandler(err, req, res, next) {
-    console.log(err.stack)
+    winston.error(err.message, err)
     res.status(500).send('Something failed.')
 }
 
