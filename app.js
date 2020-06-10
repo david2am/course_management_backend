@@ -1,21 +1,22 @@
 const express = require('express');
-require('express-async-errors')
-const winston = require('winston')
+require('express-async-errors');
+
+const exceptHandler = require('./exceptHandler');
 
 const error = require('./middleware/error.middleware')
+
 const home = require('./api/home.api');
 const authors = require('./api/author.api');
 const courses = require('./api/course.api');
 const users = require('./api/users.api');
 
-const dbConnect = require('./dbConnect');
+const dbConnect = require('./dbConnect')
 
-winston.add(new winston.transports.File({ filename: 'logfile.log' }))
 
-if (!process.env.course_jwtPrivateKey) {
-    console.error('FATAL ERROR: jwt private key is not defined');
-    process.exit(1);
-}
+exceptHandler()
+
+const p = Promise.reject(new Error('Something really bad happend!'));
+p.then(() => console.log('Done!'));
 
 dbConnect()
 
