@@ -12,9 +12,8 @@ const { validateAuthor } = require('../models/author.model');
 const auth = require('../middleware/auth.middleware')
 const admin = require('../middleware/admin.middleware')
 
-const asyncMiddleware = require('../middleware/async.middleware')
 
-router.get('/', asyncMiddleware(async(req, res) => {
+router.get('/', async(req, res) => {
     pageNumber = parseInt(req.query.pageNumber)
     pageSize = parseInt(req.query.pageSize)
 
@@ -23,25 +22,25 @@ router.get('/', asyncMiddleware(async(req, res) => {
         await getAuthors();
 
     res.send(authors);
-}));
+});
 
-router.post('/', auth, asyncMiddleware(async(req, res) => {
+router.post('/', auth, async(req, res) => {
     const { error, value } = validateAuthor(req.body)
     if (error) return res.status(400).send(error.message)
 
     const author = await saveAuthor(value)
 
     res.send(author)
-}));
+});
 
-router.get('/:id', asyncMiddleware(async(req, res) => {
+router.get('/:id', async(req, res) => {
     const author = await getAuthorById(req.params.id)
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
+
     res.send(author)
-}));
+});
 
-router.put('/:id', auth, asyncMiddleware(async(req, res) => {
-
+router.put('/:id', auth, async(req, res) => {
     const { error, value } = validateAuthor(req.body)
     if (error) return res.status(400).send(error.message)
 
@@ -49,13 +48,13 @@ router.put('/:id', auth, asyncMiddleware(async(req, res) => {
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 
     res.send(author)
-}));
+});
 
-router.delete('/:id', [auth, admin], asyncMiddleware(async(req, res) => {
+router.delete('/:id', [auth, admin], async(req, res) => {
     const author = await removeAuthorById(req.params.id)
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 
     res.send(author)
-}));
+});
 
 module.exports = router;

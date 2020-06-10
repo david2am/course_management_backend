@@ -1,5 +1,5 @@
 function errorHandler(err, req, res, next) {
-    console.log(ex.stack)
+    console.log(err.stack)
     res.status(500).send('Something failed.')
 }
 

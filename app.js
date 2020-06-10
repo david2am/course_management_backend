@@ -1,4 +1,5 @@
 const express = require('express');
+require('express-async-errors')
 
 const error = require('./middleware/error.middleware')
 const home = require('./api/home.api');

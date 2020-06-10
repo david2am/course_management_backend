@@ -7,23 +7,23 @@ const {
 const { validateUser } = require('../models/user.model')
 
 const auth = require('../middleware/auth.middleware')
-const asyncMiddleware = require('../middleware/async.middleware')
 
 const express = require('express');
 const bcrypt = require('bcrypt')
 const Joi = require('joi');
 const _ = require('lodash')
 
+
 const router = express.Router();
 
-router.get('/me', auth, asyncMiddleware(async(req, res) => {
+router.get('/me', auth, async(req, res) => {
     const user = await getUserById(req.user._id)
     if (!user) return res.status(404).send(`The user with the given id doesn't exist`)
 
     res.send(user)
-}));
+});
 
-router.post('/registration', asyncMiddleware(async(req, res) => {
+router.post('/registration', async(req, res) => {
     const { error, value } = validateUser(req.body)
     if (error) return res.status(400).send(error.message)
 
@@ -37,9 +37,9 @@ router.post('/registration', asyncMiddleware(async(req, res) => {
 
     const token = user.generateAuthToken()
     res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']))
-}));
+});
 
-router.post('/login', asyncMiddleware(async(req, res) => {
+router.post('/login', async(req, res) => {
     const { error, value } = validate(req.body)
     if (error) return res.status(400).send(error.message)
 
@@ -51,7 +51,7 @@ router.post('/login', asyncMiddleware(async(req, res) => {
 
     const token = user.generateAuthToken()
     res.send(token)
-}));
+});
 
 function validate(req) {
     const validString = Joi.string().required().trim().max(255);

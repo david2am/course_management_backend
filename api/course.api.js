@@ -19,9 +19,8 @@ const { validateAuthor } = require('../models/author.model');
 const auth = require('../middleware/auth.middleware')
 const admin = require('../middleware/admin.middleware')
 
-const asyncMiddleware = require('../middleware/async.middleware')
 
-router.get('/', asyncMiddleware(async(req, res) => {
+router.get('/', async(req, res) => {
     pageNumber = parseInt(req.query.pageNumber);
     pageSize = parseInt(req.query.pageSize);
 
@@ -30,9 +29,9 @@ router.get('/', asyncMiddleware(async(req, res) => {
         await getCourses();
 
     res.send(courses);
-}));
+});
 
-router.post('/', auth, asyncMiddleware(async(req, res) => {
+router.post('/', auth, async(req, res) => {
     const { error, value } = validateCourse(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -52,15 +51,16 @@ router.post('/', auth, asyncMiddleware(async(req, res) => {
     const course = await saveCourse(value);
 
     res.send(course);
-}));
+});
 
-router.get('/:id', asyncMiddleware(async(req, res) => {
+router.get('/:id', async(req, res) => {
     const course = await getCourseById(req.params.id);
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
-    res.send(course);
-}));
 
-router.put('/:id', auth, asyncMiddleware(async(req, res) => {
+    res.send(course);
+});
+
+router.put('/:id', auth, async(req, res) => {
     const { error, value } = validateCourse(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -76,16 +76,16 @@ router.put('/:id', auth, asyncMiddleware(async(req, res) => {
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
     res.send(course);
-}));
+});
 
-router.delete('/:id', [auth, admin], asyncMiddleware(async(req, res) => {
+router.delete('/:id', [auth, admin], async(req, res) => {
     const course = await removeCourseById(req.params.id);
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
     res.send(course);
-}));
+});
 
-router.post('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
+router.post('/:id/:authorId', auth, async(req, res) => {
     const { error, value } = validateAuthor(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -99,9 +99,9 @@ router.post('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
     const course_ = await addAuthor(req.params.id, author_);
 
     res.send(course_);
-}));
+});
 
-router.put('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
+router.put('/:id/:authorId', auth, async(req, res) => {
     const { error, value } = validateAuthor(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -116,6 +116,6 @@ router.put('/:id/:authorId', auth, asyncMiddleware(async(req, res) => {
     await saveAuthor(author_);
 
     res.send(courseUpdated);
-}));
+});
 
 module.exports = router;
