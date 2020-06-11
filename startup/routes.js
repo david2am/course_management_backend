@@ -2,10 +2,10 @@ const express = require('express');
 
 const error = require('../middleware/error.middleware')
 
-const home = require('../api/home.api');
-const authors = require('../api/author.api');
-const courses = require('../api/course.api');
-const users = require('../api/users.api');
+const home = require('../routes/home.api');
+const authors = require('../routes/author.route');
+const courses = require('../routes/course.api');
+const users = require('../routes/users.api');
 
 
 function routes(app) {

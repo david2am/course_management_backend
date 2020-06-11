@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const {
     saveAuthor,
     getAuthors,
@@ -8,12 +6,10 @@ const {
     updateAuthor,
     removeAuthorById
 } = require('../services/author.service')
-const { validateAuthor } = require('../models/author.model');
-const auth = require('../middleware/auth.middleware')
-const admin = require('../middleware/admin.middleware')
+const { validateAuthor } = require('../models/author.model')
 
 
-router.get('/', async(req, res) => {
+async function get(req, res) {
     pageNumber = parseInt(req.query.pageNumber)
     pageSize = parseInt(req.query.pageSize)
 
@@ -22,25 +18,25 @@ router.get('/', async(req, res) => {
         await getAuthors();
 
     res.send(authors);
-});
+}
 
-router.post('/', auth, async(req, res) => {
+async function post(req, res) {
     const { error, value } = validateAuthor(req.body)
     if (error) return res.status(400).send(error.message)
 
     const author = await saveAuthor(value)
 
     res.send(author)
-});
+};
 
-router.get('/:id', async(req, res) => {
+async function getById(req, res) {
     const author = await getAuthorById(req.params.id)
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 
     res.send(author)
-});
+};
 
-router.put('/:id', auth, async(req, res) => {
+async function putById(req, res) {
     const { error, value } = validateAuthor(req.body)
     if (error) return res.status(400).send(error.message)
 
@@ -48,13 +44,17 @@ router.put('/:id', auth, async(req, res) => {
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 
     res.send(author)
-});
+};
 
-router.delete('/:id', [auth, admin], async(req, res) => {
+async function deleteById(req, res) {
     const author = await removeAuthorById(req.params.id)
     if (!author) return res.status(404).send(`The author with the given id doesn't exist`)
 
     res.send(author)
-});
+};
 
-module.exports = router;
+exports.get = get;
+exports.post = post;
+exports.getById = getById;
+exports.putById = putById;
+exports.deleteById = deleteById;

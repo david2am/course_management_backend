@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const {
     saveCourse,
     getCourses,
@@ -16,11 +14,10 @@ const {
 } = require('../services/author.service');
 const { validateCourse } = require('../models/course.model');
 const { validateAuthor } = require('../models/author.model');
-const auth = require('../middleware/auth.middleware')
-const admin = require('../middleware/admin.middleware')
+const { deleteById } = require('./author.controller');
 
 
-router.get('/', async(req, res) => {
+async function get(req, res) {
     pageNumber = parseInt(req.query.pageNumber);
     pageSize = parseInt(req.query.pageSize);
 
@@ -29,9 +26,9 @@ router.get('/', async(req, res) => {
         await getCourses();
 
     res.send(courses);
-});
+}
 
-router.post('/', auth, async(req, res) => {
+async function post(req, res) {
     const { error, value } = validateCourse(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -51,16 +48,16 @@ router.post('/', auth, async(req, res) => {
     const course = await saveCourse(value);
 
     res.send(course);
-});
+}
 
-router.get('/:id', async(req, res) => {
+async function getById(req, res) {
     const course = await getCourseById(req.params.id);
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
     res.send(course);
-});
+}
 
-router.put('/:id', auth, async(req, res) => {
+async function putById(req, res) {
     const { error, value } = validateCourse(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -76,16 +73,16 @@ router.put('/:id', auth, async(req, res) => {
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
     res.send(course);
-});
+}
 
-router.delete('/:id', [auth, admin], async(req, res) => {
+async function deleteById(req, res) {
     const course = await removeCourseById(req.params.id);
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
     res.send(course);
-});
+}
 
-router.post('/:id/:authorId', auth, async(req, res) => {
+async function postByIdByAuthorId(req, res) {
     const { error, value } = validateAuthor(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -99,9 +96,9 @@ router.post('/:id/:authorId', auth, async(req, res) => {
     const course_ = await addAuthor(req.params.id, author_);
 
     res.send(course_);
-});
+}
 
-router.put('/:id/:authorId', auth, async(req, res) => {
+async function putByIdByAuthorId(req, res) {
     const { error, value } = validateAuthor(req.body);
     if (error) return res.status(400).send(error.message);
 
@@ -116,6 +113,12 @@ router.put('/:id/:authorId', auth, async(req, res) => {
     await saveAuthor(author_);
 
     res.send(courseUpdated);
-});
+}
 
-module.exports = router;
+exports.get = get;
+exports.post = post;
+exports.getById = getById;
+exports.putById = putById;
+exports.deleteById = deleteById;
+exports.postByIdByAuthorId = postByIdByAuthorId;
+exports.putByIdByAuthorId = putByIdByAuthorId;
