@@ -2,6 +2,7 @@ const winston = require('winston');
 const express = require('express');
 const app = express();
 
+app.set('view engine', 'ejs')
 
 require('./startup/config')()
 require('./startup/logging')()
