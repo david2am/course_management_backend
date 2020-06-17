@@ -9,7 +9,7 @@ const {
     post,
     getById,
     putById,
-    deleteById,
+    removeById,
     postByIdByAuthorId,
     putByIdByAuthorId
 } = require('../controllers/course.controller')
@@ -18,7 +18,7 @@ router.get('/', get);
 router.post('/', auth, post);
 router.get('/:id', getById);
 router.put('/:id', auth, putById);
-router.delete('/:id', [auth, admin], deleteById);
+router.delete('/:id', [auth, admin], removeById);
 router.post('/:id/:authorId', auth, postByIdByAuthorId);
 router.put('/:id/:authorId', auth, putByIdByAuthorId);
 

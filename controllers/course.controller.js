@@ -75,7 +75,7 @@ async function putById(req, res) {
     res.send(course);
 }
 
-async function deleteById(req, res) {
+async function removeById(req, res) {
     const course = await removeCourseById(req.params.id);
     if (!course) return res.status(404).send(`The course with the given id doesn't exist`);
 
@@ -119,6 +119,6 @@ exports.get = get;
 exports.post = post;
 exports.getById = getById;
 exports.putById = putById;
-exports.deleteById = deleteById;
+exports.removeById = removeById;
 exports.postByIdByAuthorId = postByIdByAuthorId;
 exports.putByIdByAuthorId = putByIdByAuthorId;
