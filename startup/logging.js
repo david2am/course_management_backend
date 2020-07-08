@@ -5,6 +5,9 @@ require('winston-mongodb');
 
 
 function logging() {
+    if (!process.env.course_jwtPrivateKey) {
+        throw new Error('FATAL ERROR: jwt private key is not defined.');
+    }
     // handling uncaughtException
     winston.exceptions.handle(
         new winston.transports.Console({ colorize: true, prettyPrint: true }),
