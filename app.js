@@ -1,10 +1,10 @@
 const winston = require('winston');
 const app = require('express')();
-const passportSetup = require('./startup/passport-setup');
 
 app.set('view engine', 'ejs')
 
 require('./startup/logging')()
+require('./startup/passport-setup')
 require('./startup/session')(app)
 require('./startup/routes')(app)
 require('./startup/db')()

@@ -7,6 +7,7 @@ const authorRoutes = require('../routes/author.routes');
 const courseRoutes = require('../routes/course.routes');
 const userRoutes = require('../routes/users.routes');
 const authRoutes = require('../routes/auth.routes');
+const profileRoutes = require('../routes/profile.routes')
 
 
 function routes(app) {
@@ -16,6 +17,7 @@ function routes(app) {
     app.use('/api/courses', courseRoutes);
     app.use('/api/users', userRoutes);
     app.use('/auth', authRoutes)
+    app.use('/profile', profileRoutes)
 
     app.use(error)
 }
