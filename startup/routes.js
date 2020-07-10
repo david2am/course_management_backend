@@ -13,9 +13,9 @@ const profileRoutes = require('../routes/profile.routes')
 function routes(app) {
     app.use(express.json());
     app.use('/', homeRoutes);
-    app.use('/api/authors', authorRoutes);
-    app.use('/api/courses', courseRoutes);
-    app.use('/api/users', userRoutes);
+    app.use('/authors', authorRoutes);
+    app.use('/courses', courseRoutes);
+    app.use('/users', userRoutes);
     app.use('/auth', authRoutes)
     app.use('/profile', profileRoutes)
 
