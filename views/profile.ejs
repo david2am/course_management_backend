@@ -19,21 +19,18 @@
                         <a href="/auth/login">Login</a>
                     </li>
                     <% } %>
-
                         <li>
                             <a href="/">Homepage</a>
-                        </li>
-                        <li>
-                            <a href="/profile">Profile</a>
                         </li>
         </ul>
     </nav>
     <header>
-        <h1>OAuth</h1>
-        <h1>Homepage</h1>
+        <h1>Welcome to your profile,
+            <%= user.username %>
+        </h1>
     </header>
     <main>
-        <p>OAuth API</p>
+        <p>Extra info about you.</p>
     </main>
 </body>
 
