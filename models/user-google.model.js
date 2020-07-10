@@ -2,17 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    username: {
+    name: {
         type: String,
         required: true,
         minlength: 3,
         maxlength: 255,
         trim: true
     },
-    userId: {
+    email: {
         type: String,
         required: true,
-        trim: true
+        minlength: 3,
+        maxlength: 255,
+        trim: true,
+        lowercase: true,
+        unique: true
     },
     provider: {
         type: String,
@@ -23,7 +27,12 @@ const userSchema = new Schema({
     },
     photo: {
         type: String
-    }
+    },
+    userId: {
+        type: String,
+        required: true,
+        trim: true
+    },
 })
 
 const UserGoogle = mongoose.model('userGoogle', userSchema);
