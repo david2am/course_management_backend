@@ -29,7 +29,8 @@ const googletrategy = new GoogleStrategy({
         const doc = {
             username: profile.displayName,
             userId: profile.id,
-            provider: profile.provider
+            provider: profile.provider,
+            photo: profile._json.picture
         }
 
         const newUser = await (new UserGoogle(doc)).save()

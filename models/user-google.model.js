@@ -20,6 +20,9 @@ const userSchema = new Schema({
         minlength: 1,
         maxlength: 100,
         trim: true
+    },
+    photo: {
+        type: String
     }
 })
 
